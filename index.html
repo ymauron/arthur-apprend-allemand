@@ -36,6 +36,36 @@
     font-size: 18px;
   }
 
+  /* ====== LOGIN SCREEN ====== */
+  #screen-login {
+    background: linear-gradient(135deg, #4F8EF7 0%, #A78BFA 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px 16px;
+  }
+  .login-card {
+    background: #fff; border-radius: 28px; padding: 40px 32px;
+    box-shadow: 0 16px 64px rgba(0,0,0,0.18); width: 100%; max-width: 380px;
+    text-align: center; animation: popIn 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .login-avatar { font-size: 4rem; margin-bottom: 8px; display: block; }
+  .login-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 4px; }
+  .login-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 28px; }
+  .login-field { margin-bottom: 16px; text-align: left; }
+  .login-label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; }
+  .login-input {
+    width: 100%; padding: 14px 18px; border-radius: 14px; border: 2px solid var(--border);
+    font-family: 'Nunito', sans-serif; font-size: 1.05rem; font-weight: 700; outline: none;
+    transition: border-color 0.2s; color: var(--text);
+  }
+  .login-input:focus { border-color: var(--primary); }
+  .login-input.error { border-color: var(--danger); animation: shake 0.4s; }
+  .login-error {
+    background: #FEE2E2; color: #991B1B; border-radius: 10px;
+    padding: 10px 14px; font-size: 0.9rem; font-weight: 700;
+    margin-bottom: 16px; display: none;
+  }
+  .login-error.show { display: block; }
+
   /* ====== LAYOUT ====== */
   .screen { display: none; min-height: 100vh; padding: 24px 16px; }
   .screen.active { display: flex; flex-direction: column; align-items: center; }
@@ -360,6 +390,25 @@
 </style>
 </head>
 <body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="screen-login">
+  <div class="login-card">
+    <span class="login-avatar">🇩🇪</span>
+    <h1 class="login-title">Bonjour !</h1>
+    <p class="login-subtitle">Connecte-toi pour apprendre l'allemand</p>
+    <div class="login-field">
+      <label class="login-label" for="login-username">Identifiant</label>
+      <input type="text" id="login-username" class="login-input" placeholder="Ton prénom…" autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="loginKeydown(event)">
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="login-password">Mot de passe</label>
+      <input type="password" id="login-password" class="login-input" placeholder="••••••••" autocomplete="current-password" onkeydown="loginKeydown(event)">
+    </div>
+    <div class="login-error" id="login-error">❌ Identifiant ou mot de passe incorrect.</div>
+    <button class="btn btn-primary btn-lg btn-full" onclick="doLogin()">🚀 Entrer !</button>
+  </div>
+</div>
 
 <!-- ===================== HOME SCREEN ===================== -->
 <div id="screen-home" class="screen active">
@@ -1441,10 +1490,57 @@ function showToast(msg, type = '') {
 }
 
 // ============================================================
+// LOGIN
+// ============================================================
+const AUTH_USER = 'arthur';
+const AUTH_PASS = 'mauron';
+const SESSION_KEY = 'arthur_session';
+
+function isLoggedIn() {
+  return sessionStorage.getItem(SESSION_KEY) === '1';
+}
+
+function doLogin() {
+  const user = document.getElementById('login-username').value.trim().toLowerCase();
+  const pass = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('login-error');
+  const userInput = document.getElementById('login-username');
+  const passInput = document.getElementById('login-password');
+
+  if (user === AUTH_USER && pass === AUTH_PASS) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    errorEl.classList.remove('show');
+    document.getElementById('screen-login').style.display = 'none';
+    showScreen('home');
+  } else {
+    errorEl.classList.add('show');
+    userInput.classList.add('error');
+    passInput.classList.add('error');
+    passInput.value = '';
+    setTimeout(() => {
+      userInput.classList.remove('error');
+      passInput.classList.remove('error');
+    }, 500);
+    passInput.focus();
+  }
+}
+
+function loginKeydown(e) {
+  if (e.key === 'Enter') doLogin();
+}
+
+// ============================================================
 // INIT
 // ============================================================
 loadState();
-renderHome();
+if (isLoggedIn()) {
+  document.getElementById('screen-login').style.display = 'none';
+  renderHome();
+  showScreen('home');
+} else {
+  // Login screen is shown by default (no .screen class needed, it's always visible)
+  setTimeout(() => document.getElementById('login-username').focus(), 100);
+}
 </script>
 </body>
 </html>
