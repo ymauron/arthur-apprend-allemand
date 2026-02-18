@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇩🇪 Arthur apprend l'allemand !</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #4F8EF7;
+    --primary-dark: #2D6FD4;
+    --secondary: #FFD93D;
+    --secondary-dark: #F4C000;
+    --success: #6BCB77;
+    --success-dark: #44A452;
+    --danger: #FF6B6B;
+    --danger-dark: #D94444;
+    --purple: #A78BFA;
+    --purple-dark: #7C5FD4;
+    --bg: #F0F6FF;
+    --card: #FFFFFF;
+    --text: #1E293B;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(79,142,247,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 18px;
+  }
+
+  /* ====== LAYOUT ====== */
+  .screen { display: none; min-height: 100vh; padding: 24px 16px; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  .container { width: 100%; max-width: 680px; }
+
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; max-width: 680px; margin-bottom: 24px;
+  }
+
+  /* ====== TYPOGRAPHY ====== */
+  h1 { font-size: 2.2rem; font-weight: 900; }
+  h2 { font-size: 1.6rem; font-weight: 800; }
+  h3 { font-size: 1.2rem; font-weight: 700; }
+
+  .emoji-big { font-size: 3rem; display: block; margin-bottom: 8px; }
+
+  /* ====== BUTTONS ====== */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 28px; border-radius: 50px; border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
+    transition: transform 0.1s, box-shadow 0.1s; user-select: none;
+    text-decoration: none;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 0 var(--primary-dark); }
+  .btn-primary:hover { box-shadow: 0 6px 0 var(--primary-dark); transform: translateY(-2px); }
+  .btn-secondary { background: var(--secondary); color: #1E293B; box-shadow: 0 4px 0 var(--secondary-dark); }
+  .btn-secondary:hover { box-shadow: 0 6px 0 var(--secondary-dark); transform: translateY(-2px); }
+  .btn-success { background: var(--success); color: #fff; box-shadow: 0 4px 0 var(--success-dark); }
+  .btn-danger { background: var(--danger); color: #fff; box-shadow: 0 4px 0 var(--danger-dark); }
+  .btn-ghost { background: transparent; color: var(--text-muted); box-shadow: none; border: 2px solid var(--border); }
+  .btn-ghost:hover { background: var(--border); }
+  .btn-purple { background: var(--purple); color: #fff; box-shadow: 0 4px 0 var(--purple-dark); }
+  .btn-sm { padding: 8px 18px; font-size: 0.9rem; }
+  .btn-lg { padding: 18px 36px; font-size: 1.15rem; }
+  .btn-full { width: 100%; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ====== CARDS ====== */
+  .card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 24px;
+    border: 2px solid transparent;
+  }
+  .card-hover:hover { border-color: var(--primary); cursor: pointer; transform: translateY(-2px); transition: transform 0.15s, border-color 0.15s; }
+
+  /* ====== HOME SCREEN ====== */
+  #screen-home { background: linear-gradient(135deg, #4F8EF7 0%, #A78BFA 100%); }
+  #screen-home .container { text-align: center; }
+
+  .home-title { color: #fff; font-size: 2.8rem; font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 8px; }
+  .home-subtitle { color: rgba(255,255,255,0.85); font-size: 1.1rem; margin-bottom: 32px; }
+
+  .config-panel {
+    background: rgba(255,255,255,0.95); border-radius: 24px;
+    padding: 28px; margin-bottom: 20px; text-align: left;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  }
+  .config-panel h3 { margin-bottom: 16px; color: var(--text); }
+
+  /* Vocab list selector */
+  .vocab-list-grid { display: flex; flex-direction: column; gap: 10px; }
+  .vocab-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: 12px; border: 2px solid var(--border);
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    background: #fff;
+  }
+  .vocab-item.selected { border-color: var(--primary); background: #EFF6FF; }
+  .vocab-item-info { flex: 1; }
+  .vocab-item-name { font-weight: 700; }
+  .vocab-item-count { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* Difficulty selector */
+  .diff-grid { display: flex; gap: 10px; }
+  .diff-btn {
+    flex: 1; padding: 12px 8px; border-radius: 12px; border: 2px solid var(--border);
+    cursor: pointer; text-align: center; transition: all 0.15s; background: #fff;
+    font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--text);
+  }
+  .diff-btn .diff-emoji { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+  .diff-btn.selected { border-color: var(--primary); background: #EFF6FF; color: var(--primary); }
+
+  /* Mode selector */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mode-btn {
+    padding: 14px 10px; border-radius: 12px; border: 2px solid var(--border);
+    cursor: pointer; text-align: center; transition: all 0.15s; background: #fff;
+    font-family: 'Nunito', sans-serif; color: var(--text);
+  }
+  .mode-btn .mode-emoji { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+  .mode-btn .mode-name { font-size: 0.9rem; font-weight: 700; display: block; }
+  .mode-btn .mode-desc { font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 2px; }
+  .mode-btn.selected { border-color: var(--primary); background: #EFF6FF; }
+
+  /* ====== GAME SCREENS ====== */
+  .game-header {
+    width: 100%; max-width: 680px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .score-badge {
+    background: var(--secondary); color: #1E293B;
+    padding: 6px 16px; border-radius: 50px; font-weight: 800; font-size: 1rem;
+  }
+  .progress-bar-wrap {
+    width: 100%; max-width: 680px; height: 10px;
+    background: var(--border); border-radius: 99px; margin-bottom: 20px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--primary), var(--purple));
+    border-radius: 99px; transition: width 0.4s ease;
+  }
+  .timer-ring {
+    font-size: 1.4rem; font-weight: 900; color: var(--danger);
+  }
+
+  /* ====== FLASHCARDS ====== */
+  .flashcard-wrap {
+    perspective: 1000px; width: 100%; max-width: 520px; height: 260px;
+    margin: 16px auto; cursor: pointer;
+  }
+  .flashcard-inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .flashcard-wrap.flipped .flashcard-inner { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute; width: 100%; height: 100%;
+    border-radius: 24px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    box-shadow: 0 8px 32px rgba(79,142,247,0.18);
+    padding: 24px;
+  }
+  .flashcard-front { background: linear-gradient(135deg, #4F8EF7, #A78BFA); color: #fff; }
+  .flashcard-back { background: linear-gradient(135deg, #FFD93D, #FF9A3C); color: #1E293B; transform: rotateY(180deg); }
+  .flashcard-lang { font-size: 0.85rem; font-weight: 700; opacity: 0.75; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .flashcard-word { font-size: 2.2rem; font-weight: 900; text-align: center; }
+  .flashcard-hint { font-size: 0.85rem; opacity: 0.65; margin-top: 12px; }
+
+  .fc-actions { display: flex; gap: 12px; width: 100%; max-width: 520px; margin: 0 auto 12px; }
+
+  /* ====== QCM ====== */
+  .qcm-question-card {
+    background: linear-gradient(135deg, #4F8EF7, #A78BFA);
+    color: #fff; border-radius: 24px; padding: 32px 24px; text-align: center;
+    margin-bottom: 20px; box-shadow: 0 8px 32px rgba(79,142,247,0.2);
+  }
+  .qcm-word { font-size: 2.4rem; font-weight: 900; margin-bottom: 6px; }
+  .qcm-direction { font-size: 0.85rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 2px; }
+  .qcm-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+  .qcm-btn {
+    padding: 18px 12px; border-radius: 16px; border: 3px solid var(--border);
+    cursor: pointer; text-align: center; font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem; font-weight: 700; background: #fff; color: var(--text);
+    transition: all 0.15s; line-height: 1.3;
+  }
+  .qcm-btn:hover:not(:disabled) { border-color: var(--primary); background: #EFF6FF; }
+  .qcm-btn.correct { background: var(--success); color: #fff; border-color: var(--success-dark); }
+  .qcm-btn.wrong { background: var(--danger); color: #fff; border-color: var(--danger-dark); }
+  .qcm-btn:disabled { cursor: default; }
+
+  /* ====== DICTÉE ====== */
+  .dictee-card {
+    background: linear-gradient(135deg, #6BCB77, #4CAF50);
+    color: #fff; border-radius: 24px; padding: 32px 24px; text-align: center;
+    margin-bottom: 20px;
+  }
+  .dictee-word { font-size: 2.2rem; font-weight: 900; margin-bottom: 4px; }
+  .dictee-lang { font-size: 0.85rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 2px; }
+  .dictee-input-wrap { display: flex; gap: 10px; margin-bottom: 16px; }
+  .dictee-input {
+    flex: 1; padding: 16px 20px; border-radius: 14px; border: 3px solid var(--border);
+    font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 700;
+    outline: none; transition: border-color 0.2s;
+  }
+  .dictee-input:focus { border-color: var(--primary); }
+  .dictee-input.correct { border-color: var(--success); background: #F0FFF4; }
+  .dictee-input.wrong { border-color: var(--danger); background: #FFF5F5; }
+  .dictee-feedback {
+    padding: 14px 18px; border-radius: 12px; font-weight: 700; font-size: 1rem;
+    margin-bottom: 12px; text-align: center; display: none;
+  }
+  .dictee-feedback.correct { background: #DCFCE7; color: #166534; display: block; }
+  .dictee-feedback.wrong { background: #FEE2E2; color: #991B1B; display: block; }
+  .dictee-hint { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px; display: none; }
+
+  /* ====== ASSOCIATION ====== */
+  .assoc-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    width: 100%;
+  }
+  .assoc-col { display: flex; flex-direction: column; gap: 10px; }
+  .assoc-tile {
+    padding: 16px 12px; border-radius: 14px; border: 3px solid var(--border);
+    cursor: pointer; text-align: center; font-weight: 700; font-size: 0.95rem;
+    background: #fff; transition: all 0.15s; user-select: none;
+    min-height: 52px; display: flex; align-items: center; justify-content: center;
+  }
+  .assoc-tile:hover:not(.matched):not(.disabled) { border-color: var(--primary); background: #EFF6FF; }
+  .assoc-tile.selected { border-color: var(--purple); background: #F5F3FF; transform: scale(1.04); }
+  .assoc-tile.matched { background: var(--success); color: #fff; border-color: var(--success-dark); cursor: default; opacity: 0.7; }
+  .assoc-tile.wrong-flash { animation: wrongFlash 0.5s; }
+  @keyframes wrongFlash {
+    0%,100% { border-color: var(--border); background: #fff; }
+    25%,75% { border-color: var(--danger); background: #FFF5F5; }
+  }
+
+  /* ====== RESULTS SCREEN ====== */
+  .result-stars { font-size: 3rem; margin: 16px 0; }
+  .result-score { font-size: 3rem; font-weight: 900; color: var(--primary); }
+  .result-msg { font-size: 1.1rem; color: var(--text-muted); margin: 8px 0 24px; }
+
+  /* ====== SETTINGS SCREEN ====== */
+  .settings-section { margin-bottom: 24px; }
+  .settings-section h3 { margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+  .input-group { display: flex; gap: 10px; margin-bottom: 12px; }
+  .text-input {
+    flex: 1; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--border);
+    font-family: 'Nunito', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s;
+  }
+  .text-input:focus { border-color: var(--primary); }
+  .api-key-saved { color: var(--success); font-size: 0.9rem; font-weight: 700; margin-top: 6px; display: none; }
+
+  /* Vocab list management */
+  .vocab-manage-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: 12px; background: var(--bg);
+    margin-bottom: 8px;
+  }
+  .vocab-manage-info { flex: 1; }
+  .vocab-manage-name { font-weight: 700; }
+  .vocab-manage-meta { font-size: 0.82rem; color: var(--text-muted); }
+
+  /* Upload area */
+  .upload-area {
+    border: 3px dashed var(--border); border-radius: 16px; padding: 32px 16px;
+    text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  }
+  .upload-area:hover, .upload-area.dragging { border-color: var(--primary); background: #EFF6FF; }
+  .upload-area input { display: none; }
+
+  /* OCR Preview */
+  .ocr-preview { margin-top: 16px; }
+  .ocr-pair {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+  }
+  .ocr-pair input { flex: 1; padding: 8px 12px; border-radius: 8px; border: 2px solid var(--border); font-family: 'Nunito', sans-serif; font-size: 0.95rem; }
+  .ocr-pair input:focus { outline: none; border-color: var(--primary); }
+  .ocr-pair .btn-danger { padding: 8px 12px; border-radius: 8px; }
+
+  /* Loading spinner */
+  .spinner {
+    width: 40px; height: 40px; border: 4px solid var(--border);
+    border-top-color: var(--primary); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 16px auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-msg { text-align: center; color: var(--text-muted); font-size: 1rem; }
+
+  /* ====== TOAST ====== */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1E293B; color: #fff; padding: 12px 24px; border-radius: 50px;
+    font-weight: 700; font-size: 0.95rem; z-index: 9999;
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--success-dark); }
+  .toast.error { background: var(--danger-dark); }
+
+  /* ====== UTILITIES ====== */
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .gap-4 { gap: 16px; }
+  .mt-2 { margin-top: 8px; }
+  .mt-4 { margin-top: 16px; }
+  .mb-2 { margin-bottom: 8px; }
+  .mb-4 { margin-bottom: 16px; }
+  .text-center { text-align: center; }
+  .text-muted { color: var(--text-muted); }
+  .w-full { width: 100%; }
+  .hidden { display: none !important; }
+
+  /* Animations */
+  @keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .pop-in { animation: popIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-8px); }
+    40%,80% { transform: translateX(8px); }
+  }
+  .shake { animation: shake 0.4s; }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    h1 { font-size: 1.8rem; }
+    .home-title { font-size: 2.2rem; }
+    .qcm-choices { grid-template-columns: 1fr; }
+    .mode-grid { grid-template-columns: 1fr 1fr; }
+    .flashcard-word { font-size: 1.8rem; }
+  }
+
+  /* No vocab warning */
+  .empty-state {
+    text-align: center; padding: 40px 20px; color: var(--text-muted);
+  }
+  .empty-state .empty-emoji { font-size: 3rem; margin-bottom: 12px; display: block; }
+</style>
+</head>
+<body>
+
+<!-- ===================== HOME SCREEN ===================== -->
+<div id="screen-home" class="screen active">
+  <div class="container">
+    <div style="text-align:center; margin-bottom: 24px; padding-top: 16px;">
+      <h1 class="home-title">🇩🇪 Arthur apprend<br>l'allemand !</h1>
+      <p class="home-subtitle">Choisis ta liste, ton niveau et ton jeu</p>
+    </div>
+
+    <!-- Vocab list selection -->
+    <div class="config-panel">
+      <h3>📚 Liste de vocabulaire</h3>
+      <div id="home-vocab-list" class="vocab-list-grid">
+        <div class="empty-state">
+          <span class="empty-emoji">📭</span>
+          <p>Aucune liste pour l'instant.<br>Va dans les <strong>Réglages</strong> pour en ajouter !</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Difficulty -->
+    <div class="config-panel">
+      <h3>⚡ Niveau de difficulté</h3>
+      <div class="diff-grid">
+        <button class="diff-btn selected" data-diff="facile" onclick="selectDifficulty(this)">
+          <span class="diff-emoji">🌱</span>Facile
+        </button>
+        <button class="diff-btn" data-diff="moyen" onclick="selectDifficulty(this)">
+          <span class="diff-emoji">🔥</span>Moyen
+        </button>
+        <button class="diff-btn" data-diff="difficile" onclick="selectDifficulty(this)">
+          <span class="diff-emoji">💀</span>Difficile
+        </button>
+      </div>
+    </div>
+
+    <!-- Game mode -->
+    <div class="config-panel">
+      <h3>🎮 Mode de jeu</h3>
+      <div class="mode-grid">
+        <button class="mode-btn selected" data-mode="flashcards" onclick="selectMode(this)">
+          <span class="mode-emoji">🃏</span>
+          <span class="mode-name">Cartes-mémoire</span>
+          <span class="mode-desc">Retourne les cartes</span>
+        </button>
+        <button class="mode-btn" data-mode="qcm" onclick="selectMode(this)">
+          <span class="mode-emoji">🎯</span>
+          <span class="mode-name">Choix multiple</span>
+          <span class="mode-desc">4 réponses possibles</span>
+        </button>
+        <button class="mode-btn" data-mode="dictee" onclick="selectMode(this)">
+          <span class="mode-emoji">✏️</span>
+          <span class="mode-name">Dictée</span>
+          <span class="mode-desc">Écris la traduction</span>
+        </button>
+        <button class="mode-btn" data-mode="association" onclick="selectMode(this)">
+          <span class="mode-emoji">🔗</span>
+          <span class="mode-name">Association</span>
+          <span class="mode-desc">Relie les paires</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-lg btn-full" id="start-btn" onclick="startGame()" disabled>
+      🚀 Commencer !
+    </button>
+
+    <div style="text-align:center; margin-top:16px;">
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('settings')">⚙️ Réglages</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FLASHCARDS SCREEN ===================== -->
+<div id="screen-flashcards" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('home')">← Retour</button>
+    <span class="score-badge">⭐ <span id="fc-score">0</span></span>
+  </div>
+  <div class="progress-bar-wrap" style="max-width:680px; width:100%;">
+    <div class="progress-bar-fill" id="fc-progress" style="width:0%"></div>
+  </div>
+  <div class="container" style="text-align:center;">
+    <p class="text-muted mb-2" id="fc-counter">Carte 1 / 10</p>
+    <div class="flashcard-wrap" id="flashcard" onclick="flipCard()">
+      <div class="flashcard-inner">
+        <div class="flashcard-face flashcard-front">
+          <span class="flashcard-lang">🇩🇪 Allemand</span>
+          <span class="flashcard-word" id="fc-word-front">-</span>
+          <span class="flashcard-hint">Clique pour voir la traduction !</span>
+        </div>
+        <div class="flashcard-face flashcard-back">
+          <span class="flashcard-lang">🇫🇷 Français</span>
+          <span class="flashcard-word" id="fc-word-back">-</span>
+          <span class="flashcard-hint">Est-ce que tu savais ?</span>
+        </div>
+      </div>
+    </div>
+    <div class="fc-actions" id="fc-actions" style="display:none;">
+      <button class="btn btn-danger btn-full" onclick="fcAnswer(false)">😬 Je ne savais pas</button>
+      <button class="btn btn-success btn-full" onclick="fcAnswer(true)">😄 Je savais !</button>
+    </div>
+    <p class="text-muted" id="fc-flip-hint" style="font-size:0.9rem; margin-top:8px;">Clique sur la carte pour la retourner</p>
+  </div>
+</div>
+
+<!-- ===================== QCM SCREEN ===================== -->
+<div id="screen-qcm" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('home')">← Retour</button>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <span id="qcm-timer-display" class="timer-ring hidden">⏱ <span id="qcm-timer">30</span>s</span>
+      <span class="score-badge">⭐ <span id="qcm-score">0</span></span>
+    </div>
+  </div>
+  <div class="progress-bar-wrap" style="max-width:680px; width:100%;">
+    <div class="progress-bar-fill" id="qcm-progress" style="width:0%"></div>
+  </div>
+  <div class="container">
+    <div class="qcm-question-card">
+      <div class="qcm-direction" id="qcm-direction">🇩🇪 → 🇫🇷</div>
+      <div class="qcm-word" id="qcm-word">-</div>
+    </div>
+    <div class="qcm-choices" id="qcm-choices"></div>
+    <p class="text-muted text-center mt-4" id="qcm-counter" style="font-size:0.9rem;">Question 1 / 10</p>
+  </div>
+</div>
+
+<!-- ===================== DICTÉE SCREEN ===================== -->
+<div id="screen-dictee" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('home')">← Retour</button>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <span id="dictee-timer-display" class="timer-ring hidden">⏱ <span id="dictee-timer">30</span>s</span>
+      <span class="score-badge">⭐ <span id="dictee-score">0</span></span>
+    </div>
+  </div>
+  <div class="progress-bar-wrap" style="max-width:680px; width:100%;">
+    <div class="progress-bar-fill" id="dictee-progress" style="width:0%"></div>
+  </div>
+  <div class="container">
+    <div class="dictee-card">
+      <div class="dictee-lang" id="dictee-lang">🇫🇷 Français → 🇩🇪 Allemand</div>
+      <div class="dictee-word" id="dictee-word">-</div>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.25);color:#fff;margin-top:12px;" onclick="speakWord()" id="dictee-speak-btn">🔊 Écouter</button>
+    </div>
+    <div class="dictee-hint" id="dictee-hint-text"></div>
+    <div class="dictee-feedback" id="dictee-feedback"></div>
+    <div class="dictee-input-wrap">
+      <input type="text" class="dictee-input" id="dictee-input" placeholder="Tape ta réponse en allemand…" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="dicteeKeydown(event)">
+      <button class="btn btn-primary" onclick="checkDictee()" id="dictee-submit-btn">✓</button>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-ghost btn-sm" onclick="showDicteeHint()" id="dictee-hint-btn">💡 Indice</button>
+      <button class="btn btn-secondary btn-sm hidden" onclick="dicteeNext()" id="dictee-next-btn">Suivant →</button>
+    </div>
+    <p class="text-muted text-center mt-4" id="dictee-counter" style="font-size:0.9rem;">Question 1 / 10</p>
+  </div>
+</div>
+
+<!-- ===================== ASSOCIATION SCREEN ===================== -->
+<div id="screen-association" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('home')">← Retour</button>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <span id="assoc-timer-display" class="timer-ring hidden">⏱ <span id="assoc-timer">60</span>s</span>
+      <span class="score-badge">⭐ <span id="assoc-pairs">0</span> paires</span>
+    </div>
+  </div>
+  <div class="container">
+    <p class="text-muted text-center mb-4" style="font-size:0.9rem;">Clique sur un mot allemand, puis sur sa traduction française !</p>
+    <div class="assoc-grid">
+      <div class="assoc-col" id="assoc-col-de"></div>
+      <div class="assoc-col" id="assoc-col-fr"></div>
+    </div>
+    <p class="text-muted text-center mt-4" id="assoc-counter" style="font-size:0.9rem;">0 / 8 paires trouvées</p>
+  </div>
+</div>
+
+<!-- ===================== RESULTS SCREEN ===================== -->
+<div id="screen-results" class="screen">
+  <div class="container" style="text-align:center; padding-top:40px;">
+    <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+    <h2 id="result-title">Bravo Arthur !</h2>
+    <div class="result-score" id="result-score">8 / 10</div>
+    <p class="result-msg" id="result-msg">Excellent travail !</p>
+    <div style="display:flex; flex-direction:column; gap:12px; max-width:320px; margin:0 auto;">
+      <button class="btn btn-primary btn-lg" onclick="replayGame()">🔄 Rejouer</button>
+      <button class="btn btn-ghost" onclick="showScreen('home')">🏠 Accueil</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SETTINGS SCREEN ===================== -->
+<div id="screen-settings" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('home')">← Retour</button>
+    <h2>⚙️ Réglages</h2>
+    <div style="width:80px;"></div>
+  </div>
+  <div class="container">
+
+    <!-- API Key -->
+    <div class="card settings-section">
+      <h3>🔑 Clé API Anthropic</h3>
+      <p class="text-muted mb-2" style="font-size:0.9rem;">Nécessaire pour importer des listes via photo. <a href="https://console.anthropic.com/" target="_blank" style="color:var(--primary);">Obtenir une clé</a></p>
+      <div class="input-group">
+        <input type="password" class="text-input" id="api-key-input" placeholder="sk-ant-…">
+        <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Sauvegarder</button>
+      </div>
+      <div class="api-key-saved" id="api-key-saved">✅ Clé API sauvegardée !</div>
+    </div>
+
+    <!-- Add vocab list -->
+    <div class="card settings-section">
+      <h3>📷 Ajouter une liste depuis une photo</h3>
+      <p class="text-muted mb-2" style="font-size:0.9rem;">Prends en photo ta liste de vocabulaire : l'IA extraira les mots automatiquement !</p>
+      <div class="upload-area" id="upload-area" onclick="document.getElementById('vocab-file-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+        <input type="file" id="vocab-file-input" accept="image/*" onchange="handleFileSelect(event)">
+        <p style="font-size:2rem; margin-bottom:8px;">📸</p>
+        <p style="font-weight:700;">Clique ou glisse une photo ici</p>
+        <p class="text-muted" style="font-size:0.85rem;">JPG, PNG, HEIC — jusqu'à 10 Mo</p>
+      </div>
+      <div id="ocr-loading" class="hidden" style="margin-top:16px;">
+        <div class="spinner"></div>
+        <p class="loading-msg">L'IA analyse ta liste… ✨</p>
+      </div>
+      <div id="ocr-result" class="hidden" style="margin-top:16px;">
+        <h3 style="margin-bottom:12px;">✏️ Vérifie et corrige les mots extraits</h3>
+        <div class="input-group">
+          <input type="text" class="text-input" id="list-name-input" placeholder="Nom de la liste (ex: Leçon 3 — Les animaux)">
+        </div>
+        <div id="ocr-pairs"></div>
+        <div style="display:flex; gap:10px; margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="addOcrPair()">+ Ajouter une paire</button>
+          <button class="btn btn-primary btn-sm" onclick="saveVocabList()" style="margin-left:auto;">💾 Sauvegarder la liste</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual add -->
+    <div class="card settings-section">
+      <h3>✍️ Ajouter une liste manuellement</h3>
+      <div class="input-group">
+        <input type="text" class="text-input" id="manual-list-name" placeholder="Nom de la liste">
+      </div>
+      <div id="manual-pairs">
+        <div class="ocr-pair" id="manual-pair-0">
+          <input type="text" placeholder="🇩🇪 Mot allemand" data-de>
+          <input type="text" placeholder="🇫🇷 Traduction française" data-fr>
+          <button class="btn btn-danger btn-sm" onclick="removeManualPair(this)">✕</button>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:12px;">
+        <button class="btn btn-ghost btn-sm" onclick="addManualPair()">+ Ajouter une paire</button>
+        <button class="btn btn-primary btn-sm" onclick="saveManualList()" style="margin-left:auto;">💾 Sauvegarder</button>
+      </div>
+    </div>
+
+    <!-- Existing vocab lists -->
+    <div class="card settings-section">
+      <h3>📚 Mes listes de vocabulaire</h3>
+      <div id="vocab-manage-list">
+        <div class="empty-state">
+          <span class="empty-emoji">📭</span>
+          <p>Aucune liste encore. Ajoutes-en une !</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  vocabLists: [],       // [{id, name, words:[{de,fr}], createdAt}]
+  selectedListId: null,
+  difficulty: 'facile', // 'facile' | 'moyen' | 'difficile'
+  mode: 'flashcards',   // 'flashcards' | 'qcm' | 'dictee' | 'association'
+  apiKey: '',
+  currentGame: null,    // game session object
+};
+
+// ============================================================
+// PERSISTENCE
+// ============================================================
+function loadState() {
+  try {
+    const lists = localStorage.getItem('arthur_vocab_lists');
+    if (lists) state.vocabLists = JSON.parse(lists);
+    const key = localStorage.getItem('arthur_api_key');
+    if (key) state.apiKey = key;
+    const settings = localStorage.getItem('arthur_settings');
+    if (settings) {
+      const s = JSON.parse(settings);
+      if (s.difficulty) state.difficulty = s.difficulty;
+    }
+  } catch(e) { console.error('loadState error', e); }
+}
+
+function saveVocabLists() {
+  localStorage.setItem('arthur_vocab_lists', JSON.stringify(state.vocabLists));
+}
+
+function saveSettings() {
+  localStorage.setItem('arthur_settings', JSON.stringify({ difficulty: state.difficulty }));
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (name === 'home') renderHome();
+  if (name === 'settings') renderSettings();
+}
+
+// ============================================================
+// HOME SCREEN
+// ============================================================
+function renderHome() {
+  // Vocab list
+  const container = document.getElementById('home-vocab-list');
+  if (state.vocabLists.length === 0) {
+    container.innerHTML = `<div class="empty-state"><span class="empty-emoji">📭</span><p>Aucune liste pour l'instant.<br>Va dans les <strong>Réglages</strong> pour en ajouter !</p></div>`;
+  } else {
+    container.innerHTML = state.vocabLists.map(list => `
+      <div class="vocab-item ${state.selectedListId === list.id ? 'selected' : ''}" onclick="selectVocabList('${list.id}')">
+        <div class="vocab-item-info">
+          <div class="vocab-item-name">📋 ${escHtml(list.name)}</div>
+          <div class="vocab-item-count">${list.words.length} mots</div>
+        </div>
+        ${state.selectedListId === list.id ? '<span style="color:var(--primary);font-size:1.3rem;">✓</span>' : ''}
+      </div>
+    `).join('');
+  }
+  // Difficulty
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.diff === state.difficulty);
+  });
+  // Start button
+  updateStartBtn();
+}
+
+function selectVocabList(id) {
+  state.selectedListId = id;
+  renderHome();
+}
+
+function selectDifficulty(btn) {
+  state.difficulty = btn.dataset.diff;
+  saveSettings();
+  renderHome();
+}
+
+function selectMode(btn) {
+  state.mode = btn.dataset.mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updateStartBtn();
+}
+
+function updateStartBtn() {
+  const btn = document.getElementById('start-btn');
+  const list = state.vocabLists.find(l => l.id === state.selectedListId);
+  const hasEnough = list && list.words.length >= 2;
+  btn.disabled = !state.selectedListId || !hasEnough;
+  btn.title = hasEnough ? '' : 'Sélectionne une liste avec au moins 2 mots';
+}
+
+// ============================================================
+// GAME LAUNCHER
+// ============================================================
+function getWordsForGame() {
+  const list = state.vocabLists.find(l => l.id === state.selectedListId);
+  if (!list) return [];
+  let words = shuffle([...list.words]);
+  const maxWords = { facile: 5, moyen: 10, difficile: 999 };
+  return words.slice(0, Math.min(words.length, maxWords[state.difficulty]));
+}
+
+function startGame() {
+  const words = getWordsForGame();
+  if (words.length < 2) { showToast('Il faut au moins 2 mots pour jouer !', 'error'); return; }
+  if (state.mode === 'flashcards') startFlashcards(words);
+  else if (state.mode === 'qcm') startQcm(words);
+  else if (state.mode === 'dictee') startDictee(words);
+  else if (state.mode === 'association') startAssociation(words);
+}
+
+function replayGame() {
+  startGame();
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showResults(correct, total, mode) {
+  clearGameTimers();
+  const pct = total > 0 ? correct / total : 0;
+  let stars, title, msg;
+  if (pct >= 0.9) { stars = '⭐⭐⭐'; title = 'Bravo Arthur ! 🎉'; msg = 'Tu es un champion de l\'allemand !'; }
+  else if (pct >= 0.6) { stars = '⭐⭐'; title = 'Bien joué ! 👍'; msg = 'Continue comme ça, tu progresses !'; }
+  else { stars = '⭐'; title = 'Courage ! 💪'; msg = 'Un peu plus de pratique et tu y seras !'; }
+  document.getElementById('result-stars').textContent = stars;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-score').textContent = `${correct} / ${total}`;
+  document.getElementById('result-msg').textContent = msg;
+  showScreen('results');
+}
+
+// ============================================================
+// FLASHCARDS
+// ============================================================
+let fc = {};
+
+function startFlashcards(words) {
+  fc = { words, idx: 0, score: 0, flipped: false };
+  showScreen('flashcards');
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  const w = fc.words[fc.idx];
+  document.getElementById('fc-word-front').textContent = w.de;
+  document.getElementById('fc-word-back').textContent = w.fr;
+  document.getElementById('fc-counter').textContent = `Carte ${fc.idx + 1} / ${fc.words.length}`;
+  document.getElementById('fc-score').textContent = fc.score;
+  document.getElementById('fc-progress').style.width = `${(fc.idx / fc.words.length) * 100}%`;
+  const card = document.getElementById('flashcard');
+  card.classList.remove('flipped');
+  fc.flipped = false;
+  document.getElementById('fc-actions').style.display = 'none';
+  document.getElementById('fc-flip-hint').style.display = 'block';
+}
+
+function flipCard() {
+  if (fc.flipped) return;
+  fc.flipped = true;
+  document.getElementById('flashcard').classList.add('flipped');
+  document.getElementById('fc-actions').style.display = 'flex';
+  document.getElementById('fc-flip-hint').style.display = 'none';
+}
+
+function fcAnswer(knew) {
+  if (knew) fc.score++;
+  fc.idx++;
+  if (fc.idx >= fc.words.length) {
+    showResults(fc.score, fc.words.length, 'flashcards');
+  } else {
+    renderFlashcard();
+  }
+}
+
+// ============================================================
+// QCM
+// ============================================================
+let qcm = {};
+let qcmTimerInterval = null;
+
+function startQcm(words) {
+  qcm = { words, idx: 0, score: 0, answered: false };
+  clearInterval(qcmTimerInterval);
+  showScreen('qcm');
+  if (state.difficulty === 'difficile') {
+    document.getElementById('qcm-timer-display').classList.remove('hidden');
+  } else {
+    document.getElementById('qcm-timer-display').classList.add('hidden');
+  }
+  renderQcm();
+}
+
+function renderQcm() {
+  const w = qcm.words[qcm.idx];
+  // Direction: DE→FR for facile/moyen, mixed for difficile
+  const deToFr = state.difficulty !== 'difficile' || Math.random() > 0.5;
+  qcm.deToFr = deToFr;
+  qcm.answered = false;
+
+  document.getElementById('qcm-direction').textContent = deToFr ? '🇩🇪 → 🇫🇷' : '🇫🇷 → 🇩🇪';
+  document.getElementById('qcm-word').textContent = deToFr ? w.de : w.fr;
+  document.getElementById('qcm-score').textContent = qcm.score;
+  document.getElementById('qcm-counter').textContent = `Question ${qcm.idx + 1} / ${qcm.words.length}`;
+  document.getElementById('qcm-progress').style.width = `${(qcm.idx / qcm.words.length) * 100}%`;
+
+  // Build 4 choices
+  const correctAnswer = deToFr ? w.fr : w.de;
+  const pool = qcm.words.filter((_,i) => i !== qcm.idx);
+  const wrongAnswers = shuffle(pool).slice(0, 3).map(x => deToFr ? x.fr : x.de);
+  // Ensure uniqueness
+  const choices = shuffle([correctAnswer, ...wrongAnswers].filter((v,i,a) => a.indexOf(v) === i).slice(0,4));
+  // If less than 4 unique, pad (edge case)
+  const choicesDiv = document.getElementById('qcm-choices');
+  choicesDiv.innerHTML = choices.map(c => `
+    <button class="qcm-btn" onclick="checkQcm(this, '${escAttr(c)}', '${escAttr(correctAnswer)}')">${escHtml(c)}</button>
+  `).join('');
+
+  // Timer for difficile
+  if (state.difficulty === 'difficile') {
+    let t = 20;
+    document.getElementById('qcm-timer').textContent = t;
+    clearInterval(qcmTimerInterval);
+    qcmTimerInterval = setInterval(() => {
+      t--;
+      document.getElementById('qcm-timer').textContent = t;
+      if (t <= 0) {
+        clearInterval(qcmTimerInterval);
+        if (!qcm.answered) autoWrongQcm(correctAnswer);
+      }
+    }, 1000);
+  }
+}
+
+function checkQcm(btn, chosen, correct) {
+  if (qcm.answered) return;
+  qcm.answered = true;
+  clearInterval(qcmTimerInterval);
+  document.querySelectorAll('.qcm-btn').forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    qcm.score++;
+    setTimeout(qcmNext, 900);
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct
+    document.querySelectorAll('.qcm-btn').forEach(b => {
+      if (b.textContent === correct) b.classList.add('correct');
+    });
+    setTimeout(qcmNext, 1400);
+  }
+}
+
+function autoWrongQcm(correct) {
+  qcm.answered = true;
+  document.querySelectorAll('.qcm-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct');
+  });
+  setTimeout(qcmNext, 1400);
+}
+
+function qcmNext() {
+  qcm.idx++;
+  if (qcm.idx >= qcm.words.length) showResults(qcm.score, qcm.words.length, 'qcm');
+  else renderQcm();
+}
+
+// ============================================================
+// DICTÉE
+// ============================================================
+let dictee = {};
+let dicteeTimerInterval = null;
+let dicteeTimerVal = 30;
+
+function startDictee(words) {
+  dictee = { words, idx: 0, score: 0, answered: false };
+  clearInterval(dicteeTimerInterval);
+  showScreen('dictee');
+  const showTimer = state.difficulty === 'difficile';
+  document.getElementById('dictee-timer-display').classList.toggle('hidden', !showTimer);
+  renderDictee();
+}
+
+function renderDictee() {
+  const w = dictee.words[dictee.idx];
+  dictee.answered = false;
+  // Direction: show FR, type DE
+  document.getElementById('dictee-lang').textContent = '🇫🇷 Lis → 🇩🇪 Écris en allemand';
+  document.getElementById('dictee-word').textContent = w.fr;
+  document.getElementById('dictee-score').textContent = dictee.score;
+  document.getElementById('dictee-counter').textContent = `Question ${dictee.idx + 1} / ${dictee.words.length}`;
+  document.getElementById('dictee-progress').style.width = `${(dictee.idx / dictee.words.length) * 100}%`;
+  const input = document.getElementById('dictee-input');
+  input.value = '';
+  input.className = 'dictee-input';
+  input.disabled = false;
+  document.getElementById('dictee-feedback').className = 'dictee-feedback';
+  document.getElementById('dictee-feedback').textContent = '';
+  document.getElementById('dictee-hint-text').style.display = 'none';
+  document.getElementById('dictee-hint-text').textContent = '';
+  document.getElementById('dictee-next-btn').classList.add('hidden');
+  document.getElementById('dictee-submit-btn').disabled = false;
+  const hintBtn = document.getElementById('dictee-hint-btn');
+  hintBtn.style.display = state.difficulty === 'difficile' ? 'none' : 'inline-flex';
+
+  // Store correct answer
+  dictee.correct = w.de;
+
+  // Set speak button to current french word
+  document.getElementById('dictee-speak-btn').onclick = () => speakText(w.de, 'de-DE');
+
+  setTimeout(() => input.focus(), 100);
+
+  // Timer for difficile
+  if (state.difficulty === 'difficile') {
+    dicteeTimerVal = 25;
+    document.getElementById('dictee-timer').textContent = dicteeTimerVal;
+    clearInterval(dicteeTimerInterval);
+    dicteeTimerInterval = setInterval(() => {
+      dicteeTimerVal--;
+      document.getElementById('dictee-timer').textContent = dicteeTimerVal;
+      if (dicteeTimerVal <= 0) {
+        clearInterval(dicteeTimerInterval);
+        if (!dictee.answered) { dictee.answered = true; showDicteeFeedback(false, dictee.correct); }
+      }
+    }, 1000);
+  }
+}
+
+function dicteeKeydown(e) {
+  if (e.key === 'Enter') checkDictee();
+}
+
+function checkDictee() {
+  if (dictee.answered) return;
+  const input = document.getElementById('dictee-input');
+  const userAnswer = input.value.trim();
+  if (!userAnswer) return;
+  dictee.answered = true;
+  clearInterval(dicteeTimerInterval);
+
+  const maxDist = state.difficulty === 'difficile' ? 0 : (state.difficulty === 'moyen' ? 1 : 2);
+  const dist = levenshtein(userAnswer.toLowerCase(), dictee.correct.toLowerCase());
+  const correct = dist <= maxDist;
+  if (correct) dictee.score++;
+  showDicteeFeedback(correct, dictee.correct);
+}
+
+function showDicteeFeedback(correct, answer) {
+  const input = document.getElementById('dictee-input');
+  input.disabled = true;
+  input.className = 'dictee-input ' + (correct ? 'correct' : 'wrong');
+  document.getElementById('dictee-submit-btn').disabled = true;
+
+  const fb = document.getElementById('dictee-feedback');
+  if (correct) {
+    fb.className = 'dictee-feedback correct';
+    fb.textContent = '✅ Bravo ! C\'est exact !';
+  } else {
+    fb.className = 'dictee-feedback wrong';
+    fb.innerHTML = `❌ La bonne réponse était : <strong>${escHtml(answer)}</strong>`;
+    if (!input.value.trim()) {
+      input.value = '';
+    }
+  }
+  document.getElementById('dictee-next-btn').classList.remove('hidden');
+}
+
+function dicteeNext() {
+  dictee.idx++;
+  if (dictee.idx >= dictee.words.length) showResults(dictee.score, dictee.words.length, 'dictee');
+  else renderDictee();
+}
+
+function showDicteeHint() {
+  const word = dictee.correct;
+  const hint = word[0] + '_'.repeat(Math.max(0, word.length - 1));
+  const el = document.getElementById('dictee-hint-text');
+  el.textContent = `💡 Indice : ${hint} (${word.length} lettres)`;
+  el.style.display = 'block';
+}
+
+function speakWord() {
+  const w = dictee.words[dictee.idx];
+  speakText(w.de, 'de-DE');
+}
+
+function speakText(text, lang) {
+  if (!('speechSynthesis' in window)) { showToast('La synthèse vocale n\'est pas disponible sur ce navigateur.', 'error'); return; }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = lang;
+  utter.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+// ============================================================
+// ASSOCIATION
+// ============================================================
+let assoc = {};
+let assocTimerInterval = null;
+let assocTimerVal = 60;
+
+function startAssociation(words) {
+  const maxPairs = state.difficulty === 'facile' ? 5 : (state.difficulty === 'moyen' ? 8 : 10);
+  const pairWords = shuffle([...words]).slice(0, Math.min(words.length, maxPairs));
+  assoc = {
+    words: pairWords,
+    matched: new Set(),
+    selectedDe: null,
+    selectedFr: null,
+    errors: 0,
+    totalPairs: pairWords.length,
+  };
+  clearInterval(assocTimerInterval);
+  showScreen('association');
+
+  const showTimer = state.difficulty === 'difficile';
+  document.getElementById('assoc-timer-display').classList.toggle('hidden', !showTimer);
+
+  renderAssociation();
+
+  if (showTimer) {
+    assocTimerVal = 90;
+    document.getElementById('assoc-timer').textContent = assocTimerVal;
+    assocTimerInterval = setInterval(() => {
+      assocTimerVal--;
+      document.getElementById('assoc-timer').textContent = assocTimerVal;
+      if (assocTimerVal <= 0) {
+        clearInterval(assocTimerInterval);
+        showResults(assoc.matched.size, assoc.totalPairs, 'association');
+      }
+    }, 1000);
+  }
+}
+
+function renderAssociation() {
+  const deShuffled = shuffle(assoc.words.map(w => w.de));
+  const frShuffled = shuffle(assoc.words.map(w => w.fr));
+  assoc.deOrder = deShuffled;
+  assoc.frOrder = frShuffled;
+
+  const colDe = document.getElementById('assoc-col-de');
+  const colFr = document.getElementById('assoc-col-fr');
+  colDe.innerHTML = deShuffled.map(de => `
+    <div class="assoc-tile" data-de="${escAttr(de)}" onclick="selectAssocTile(this,'de')">
+      ${escHtml(de)}
+    </div>
+  `).join('');
+  colFr.innerHTML = frShuffled.map(fr => `
+    <div class="assoc-tile" data-fr="${escAttr(fr)}" onclick="selectAssocTile(this,'fr')">
+      ${escHtml(fr)}
+    </div>
+  `).join('');
+  updateAssocCounter();
+}
+
+function selectAssocTile(tile, side) {
+  if (tile.classList.contains('matched') || tile.classList.contains('disabled')) return;
+
+  if (side === 'de') {
+    // Deselect previous DE tile
+    document.querySelectorAll('.assoc-tile[data-de]').forEach(t => t.classList.remove('selected'));
+    tile.classList.add('selected');
+    assoc.selectedDe = tile.dataset.de;
+  } else {
+    document.querySelectorAll('.assoc-tile[data-fr]').forEach(t => t.classList.remove('selected'));
+    tile.classList.add('selected');
+    assoc.selectedFr = tile.dataset.fr;
+  }
+
+  // Check for match if both selected
+  if (assoc.selectedDe && assoc.selectedFr) {
+    const match = assoc.words.find(w => w.de === assoc.selectedDe && w.fr === assoc.selectedFr);
+    if (match) {
+      // Correct!
+      assoc.matched.add(assoc.selectedDe);
+      const deTile = document.querySelector(`.assoc-tile[data-de="${CSS.escape(assoc.selectedDe)}"]`);
+      const frTile = document.querySelector(`.assoc-tile[data-fr="${CSS.escape(assoc.selectedFr)}"]`);
+      if (deTile) { deTile.classList.add('matched'); deTile.classList.remove('selected'); }
+      if (frTile) { frTile.classList.add('matched'); frTile.classList.remove('selected'); }
+      assoc.selectedDe = null;
+      assoc.selectedFr = null;
+      document.getElementById('assoc-pairs').textContent = assoc.matched.size;
+      updateAssocCounter();
+
+      if (assoc.matched.size === assoc.totalPairs) {
+        clearInterval(assocTimerInterval);
+        setTimeout(() => showResults(assoc.totalPairs, assoc.totalPairs, 'association'), 600);
+      }
+    } else {
+      // Wrong - flash both tiles
+      const deTile = document.querySelector(`.assoc-tile[data-de="${CSS.escape(assoc.selectedDe)}"]`);
+      const frTile = document.querySelector(`.assoc-tile[data-fr="${CSS.escape(assoc.selectedFr)}"]`);
+      [deTile, frTile].forEach(t => { if(t) { t.classList.add('wrong-flash'); t.classList.remove('selected'); setTimeout(() => t.classList.remove('wrong-flash'), 500); } });
+      assoc.selectedDe = null;
+      assoc.selectedFr = null;
+      assoc.errors++;
+    }
+  }
+}
+
+function updateAssocCounter() {
+  document.getElementById('assoc-counter').textContent = `${assoc.matched.size} / ${assoc.totalPairs} paires trouvées`;
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function renderSettings() {
+  // API key
+  if (state.apiKey) {
+    document.getElementById('api-key-input').value = state.apiKey;
+    document.getElementById('api-key-saved').style.display = 'block';
+  }
+  // Vocab lists
+  renderVocabManageList();
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) { showToast('Entre une clé API valide', 'error'); return; }
+  state.apiKey = key;
+  localStorage.setItem('arthur_api_key', key);
+  document.getElementById('api-key-saved').style.display = 'block';
+  showToast('Clé API sauvegardée !', 'success');
+}
+
+function renderVocabManageList() {
+  const container = document.getElementById('vocab-manage-list');
+  if (state.vocabLists.length === 0) {
+    container.innerHTML = `<div class="empty-state"><span class="empty-emoji">📭</span><p>Aucune liste encore. Ajoutes-en une !</p></div>`;
+    return;
+  }
+  container.innerHTML = state.vocabLists.map(list => `
+    <div class="vocab-manage-item">
+      <div class="vocab-manage-info">
+        <div class="vocab-manage-name">📋 ${escHtml(list.name)}</div>
+        <div class="vocab-manage-meta">${list.words.length} mots · Ajoutée le ${new Date(list.createdAt).toLocaleDateString('fr-FR')}</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deleteVocabList('${list.id}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+function deleteVocabList(id) {
+  if (!confirm('Supprimer cette liste de vocabulaire ?')) return;
+  state.vocabLists = state.vocabLists.filter(l => l.id !== id);
+  if (state.selectedListId === id) state.selectedListId = null;
+  saveVocabLists();
+  renderVocabManageList();
+  showToast('Liste supprimée', 'success');
+}
+
+// ============================================================
+// OCR / IMAGE UPLOAD
+// ============================================================
+function dragOver(e) {
+  e.preventDefault();
+  document.getElementById('upload-area').classList.add('dragging');
+}
+function dragLeave(e) {
+  document.getElementById('upload-area').classList.remove('dragging');
+}
+function dropFile(e) {
+  e.preventDefault();
+  document.getElementById('upload-area').classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) processImageFile(file);
+}
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processImageFile(file);
+}
+
+function processImageFile(file) {
+  if (!file.type.startsWith('image/')) { showToast('Sélectionne une image (JPG, PNG…)', 'error'); return; }
+  if (!state.apiKey) { showToast('Entre ta clé API dans les réglages avant d\'importer une image !', 'error'); return; }
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result.split(',')[1];
+    const mediaType = file.type || 'image/jpeg';
+    document.getElementById('ocr-loading').classList.remove('hidden');
+    document.getElementById('ocr-result').classList.add('hidden');
+    try {
+      const pairs = await extractVocabFromImage(base64, mediaType);
+      document.getElementById('ocr-loading').classList.add('hidden');
+      renderOcrResult(pairs);
+    } catch(err) {
+      document.getElementById('ocr-loading').classList.add('hidden');
+      showToast('Erreur lors de l\'analyse de l\'image : ' + err.message, 'error');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function extractVocabFromImage(base64data, mediaType) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': state.apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+      'anthropic-dangerous-direct-browser-calls': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-4-6',
+      max_tokens: 2048,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: { type: 'base64', media_type: mediaType, data: base64data }
+          },
+          {
+            type: 'text',
+            text: 'This is a German vocabulary list for a French student. Extract all vocabulary pairs from the image. Return ONLY a valid JSON array in this exact format: [{"de": "German word or phrase", "fr": "French translation"}]. Include ALL pairs visible. No explanation, no markdown, only the JSON array.'
+          }
+        ]
+      }]
+    })
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${response.status}`);
+  }
+  const data = await response.json();
+  const text = data.content[0].text.trim();
+  // Extract JSON array from response
+  const jsonMatch = text.match(/\[[\s\S]*\]/);
+  if (!jsonMatch) throw new Error('Impossible d\'extraire les mots de la réponse.');
+  const pairs = JSON.parse(jsonMatch[0]);
+  if (!Array.isArray(pairs) || pairs.length === 0) throw new Error('Aucun mot trouvé dans l\'image.');
+  return pairs;
+}
+
+// Store OCR pairs temporarily
+let ocrPairs = [];
+
+function renderOcrResult(pairs) {
+  ocrPairs = pairs.map(p => ({ de: p.de || '', fr: p.fr || '' }));
+  document.getElementById('ocr-result').classList.remove('hidden');
+  renderOcrPairs();
+  document.getElementById('list-name-input').value = '';
+  document.getElementById('list-name-input').focus();
+  showToast(`✅ ${pairs.length} paires extraites !`, 'success');
+}
+
+function renderOcrPairs() {
+  const container = document.getElementById('ocr-pairs');
+  container.innerHTML = ocrPairs.map((p, i) => `
+    <div class="ocr-pair">
+      <input type="text" value="${escAttr(p.de)}" placeholder="🇩🇪 Allemand" oninput="ocrPairs[${i}].de = this.value">
+      <input type="text" value="${escAttr(p.fr)}" placeholder="🇫🇷 Français" oninput="ocrPairs[${i}].fr = this.value">
+      <button class="btn btn-danger btn-sm" onclick="removeOcrPair(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function addOcrPair() {
+  ocrPairs.push({ de: '', fr: '' });
+  renderOcrPairs();
+}
+
+function removeOcrPair(i) {
+  ocrPairs.splice(i, 1);
+  renderOcrPairs();
+}
+
+function saveVocabList() {
+  const name = document.getElementById('list-name-input').value.trim();
+  if (!name) { showToast('Donne un nom à ta liste !', 'error'); return; }
+  const validPairs = ocrPairs.filter(p => p.de.trim() && p.fr.trim());
+  if (validPairs.length < 2) { showToast('Il faut au moins 2 paires valides !', 'error'); return; }
+
+  const list = { id: uuid(), name, words: validPairs, createdAt: Date.now() };
+  state.vocabLists.push(list);
+  state.selectedListId = list.id;
+  saveVocabLists();
+  renderVocabManageList();
+
+  document.getElementById('ocr-result').classList.add('hidden');
+  document.getElementById('list-name-input').value = '';
+  ocrPairs = [];
+  document.getElementById('vocab-file-input').value = '';
+
+  showToast(`📚 Liste "${name}" sauvegardée (${validPairs.length} mots) !`, 'success');
+}
+
+// ============================================================
+// MANUAL VOCAB ENTRY
+// ============================================================
+let manualPairCount = 1;
+
+function addManualPair() {
+  const container = document.getElementById('manual-pairs');
+  const div = document.createElement('div');
+  div.className = 'ocr-pair';
+  div.innerHTML = `
+    <input type="text" placeholder="🇩🇪 Mot allemand" data-de>
+    <input type="text" placeholder="🇫🇷 Traduction française" data-fr>
+    <button class="btn btn-danger btn-sm" onclick="removeManualPair(this)">✕</button>
+  `;
+  container.appendChild(div);
+}
+
+function removeManualPair(btn) {
+  const pairs = document.querySelectorAll('#manual-pairs .ocr-pair');
+  if (pairs.length <= 1) { showToast('Il faut au moins une paire !', 'error'); return; }
+  btn.closest('.ocr-pair').remove();
+}
+
+function saveManualList() {
+  const name = document.getElementById('manual-list-name').value.trim();
+  if (!name) { showToast('Donne un nom à ta liste !', 'error'); return; }
+
+  const pairs = [];
+  document.querySelectorAll('#manual-pairs .ocr-pair').forEach(row => {
+    const de = row.querySelector('[data-de]').value.trim();
+    const fr = row.querySelector('[data-fr]').value.trim();
+    if (de && fr) pairs.push({ de, fr });
+  });
+
+  if (pairs.length < 2) { showToast('Il faut au moins 2 paires valides !', 'error'); return; }
+
+  const list = { id: uuid(), name, words: pairs, createdAt: Date.now() };
+  state.vocabLists.push(list);
+  state.selectedListId = list.id;
+  saveVocabLists();
+  renderVocabManageList();
+
+  document.getElementById('manual-list-name').value = '';
+  document.getElementById('manual-pairs').innerHTML = `
+    <div class="ocr-pair">
+      <input type="text" placeholder="🇩🇪 Mot allemand" data-de>
+      <input type="text" placeholder="🇫🇷 Traduction française" data-fr>
+      <button class="btn btn-danger btn-sm" onclick="removeManualPair(this)">✕</button>
+    </div>
+  `;
+  showToast(`📚 Liste "${name}" sauvegardée (${pairs.length} mots) !`, 'success');
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function uuid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escAttr(str) {
+  return String(str).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m+1}, (_,i) => Array.from({length: n+1}, (_,j) => i===0?j:j===0?i:0));
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function clearGameTimers() {
+  clearInterval(qcmTimerInterval);
+  clearInterval(dicteeTimerInterval);
+  clearInterval(assocTimerInterval);
+}
+
+// Toast notifications
+let toastTimeout;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadState();
+renderHome();
+</script>
+</body>
+</html>
