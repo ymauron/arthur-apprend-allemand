@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Der, Die ou Das ? - Arthur apprend l'allemand</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="back-link">← Accueil</a>
+    <h1>🎯 Der, Die ou Das ?</h1>
+  </div>
+
+  <div class="container">
+    <!-- Quiz screen -->
+    <div id="quiz-screen">
+      <div class="score-bar">
+        <span id="score-text">0 / 0</span>
+        <span id="score-right">✅ 0</span>
+      </div>
+
+      <div class="progress-bar-container" style="margin-top: 12px;">
+        <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+      </div>
+
+      <div class="quiz-word" id="quiz-word">...</div>
+      <div class="quiz-french" id="quiz-french"></div>
+
+      <div class="article-buttons">
+        <button class="article-btn article-btn--der" onclick="answer('der')">DER</button>
+        <button class="article-btn article-btn--die" onclick="answer('die')">DIE</button>
+        <button class="article-btn article-btn--das" onclick="answer('das')">DAS</button>
+      </div>
+
+      <div id="feedback-area"></div>
+    </div>
+
+    <!-- Result screen -->
+    <div id="result-screen" class="result-screen" style="display:none;">
+      <span class="result-emoji" id="result-emoji">🎉</span>
+      <div class="result-title" id="result-title">Bravo !</div>
+      <div class="result-percent" id="result-percent">0%</div>
+      <div class="result-score" id="result-detail"></div>
+      <button class="btn btn-primary btn-block" onclick="restart()">🔄 Rejouer</button>
+      <a href="index.html" class="btn btn-outline btn-block" style="margin-top:12px;">← Accueil</a>
+    </div>
+  </div>
+
+  <script>
+    let words = [];
+    let index = 0;
+    let correct = 0;
+    let total = 0;
+    let locked = false;
+
+    fetch('vocabulary.json')
+      .then(r => r.json())
+      .then(data => {
+        words = data.filter(w => w.article !== null);
+        shuffleWords();
+        showWord();
+      });
+
+    function shuffleWords() {
+      for (let i = words.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [words[i], words[j]] = [words[j], words[i]];
+      }
+    }
+
+    function showWord() {
+      if (index >= words.length) {
+        showResult();
+        return;
+      }
+      locked = false;
+      const w = words[index];
+      document.getElementById('quiz-word').textContent = w.german;
+      document.getElementById('quiz-french').textContent = w.french;
+      document.getElementById('feedback-area').innerHTML = '';
+      document.getElementById('score-text').textContent = (index + 1) + ' / ' + words.length;
+      document.getElementById('progress-bar').style.width =
+        ((index) / words.length * 100) + '%';
+      enableButtons(true);
+    }
+
+    function answer(chosen) {
+      if (locked) return;
+      locked = true;
+      total++;
+      const w = words[index];
+      const isCorrect = chosen === w.article;
+      const fb = document.getElementById('feedback-area');
+
+      if (isCorrect) {
+        correct++;
+        fb.innerHTML = '<div class="feedback feedback--correct">' +
+          '✅ Bravo ! ' + w.article + ' ' + w.german +
+          '<div class="feedback-detail">' + w.french + '</div></div>';
+      } else {
+        fb.innerHTML = '<div class="feedback feedback--wrong shake">' +
+          '❌ C\'était <strong>' + w.article + ' ' + w.german + '</strong>' +
+          '<div class="feedback-detail">' + w.french + '</div></div>';
+      }
+
+      document.getElementById('score-right').textContent = '✅ ' + correct;
+      enableButtons(false);
+
+      setTimeout(() => {
+        index++;
+        showWord();
+      }, 2000);
+    }
+
+    function enableButtons(enabled) {
+      document.querySelectorAll('.article-btn').forEach(b => b.disabled = !enabled);
+    }
+
+    function showResult() {
+      document.getElementById('quiz-screen').style.display = 'none';
+      document.getElementById('result-screen').style.display = 'block';
+
+      const pct = Math.round(correct / words.length * 100);
+      document.getElementById('result-percent').textContent = pct + '%';
+      document.getElementById('result-detail').textContent =
+        correct + ' bonnes réponses sur ' + words.length;
+
+      if (pct >= 80) {
+        document.getElementById('result-emoji').textContent = '🏆';
+        document.getElementById('result-title').textContent = 'Super champion !';
+      } else if (pct >= 50) {
+        document.getElementById('result-emoji').textContent = '👍';
+        document.getElementById('result-title').textContent = 'Bien joué !';
+      } else {
+        document.getElementById('result-emoji').textContent = '💪';
+        document.getElementById('result-title').textContent = 'Continue à t\'entraîner !';
+      }
+    }
+
+    function restart() {
+      index = 0;
+      correct = 0;
+      total = 0;
+      shuffleWords();
+      document.getElementById('quiz-screen').style.display = 'block';
+      document.getElementById('result-screen').style.display = 'none';
+      showWord();
+    }
+  </script>
+</body>
+</html>

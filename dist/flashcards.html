@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards - Arthur apprend l'allemand</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="back-link">← Accueil</a>
+    <h1>🃏 Flashcards</h1>
+  </div>
+
+  <div class="container">
+    <div class="progress-text" id="progress">0 / 0</div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+    </div>
+
+    <div class="flashcard-scene">
+      <div class="flashcard" id="flashcard" onclick="flip()">
+        <div class="flashcard-face flashcard-front">
+          <div class="flashcard-word" id="front-word">...</div>
+          <div class="flashcard-hint">Clique pour retourner</div>
+        </div>
+        <div class="flashcard-face flashcard-back">
+          <div class="flashcard-word" id="back-word">...</div>
+          <div class="flashcard-hint" id="back-hint"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flashcard-controls">
+      <button class="btn btn-outline btn-sm" onclick="prev()">← Précédent</button>
+      <button class="btn btn-primary btn-sm" onclick="next()">Suivant →</button>
+    </div>
+
+    <div style="text-align:center; margin-top: 16px;">
+      <button class="btn btn-secondary btn-sm" onclick="shuffle()">🔀 Mélanger</button>
+    </div>
+
+    <div class="score-bar" style="margin-top: 20px;">
+      <span>Mots vus : <strong id="seen-count">0</strong></span>
+      <span>Total : <strong id="total-count">0</strong></span>
+    </div>
+  </div>
+
+  <script>
+    let words = [];
+    let index = 0;
+    let seen = new Set();
+
+    fetch('vocabulary.json')
+      .then(r => r.json())
+      .then(data => {
+        words = data;
+        document.getElementById('total-count').textContent = words.length;
+        showCard();
+      });
+
+    function showCard() {
+      if (!words.length) return;
+      const card = document.getElementById('flashcard');
+      card.classList.remove('flipped');
+
+      const w = words[index];
+      document.getElementById('front-word').textContent = w.french;
+
+      const back = w.article ? w.article + ' ' + w.german : w.german;
+      document.getElementById('back-word').textContent = back;
+      document.getElementById('back-hint').textContent = w.french;
+
+      seen.add(w.id);
+      document.getElementById('seen-count').textContent = seen.size;
+      document.getElementById('progress').textContent = (index + 1) + ' / ' + words.length;
+      document.getElementById('progress-bar').style.width =
+        ((index + 1) / words.length * 100) + '%';
+    }
+
+    function flip() {
+      document.getElementById('flashcard').classList.toggle('flipped');
+    }
+
+    function next() {
+      index = (index + 1) % words.length;
+      showCard();
+    }
+
+    function prev() {
+      index = (index - 1 + words.length) % words.length;
+      showCard();
+    }
+
+    function shuffle() {
+      for (let i = words.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [words[i], words[j]] = [words[j], words[i]];
+      }
+      index = 0;
+      showCard();
+    }
+  </script>
+</body>
+</html>

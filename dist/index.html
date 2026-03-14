@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arthur apprend l'allemand</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="home-hero">
+      <span class="flag">🇩🇪</span>
+      <h1>Apprends l'allemand avec Arthur</h1>
+      <div class="word-count" id="word-count">Chargement...</div>
+    </div>
+
+    <nav class="nav-cards">
+      <a href="flashcards.html" class="nav-card nav-card--flash">
+        <span class="nav-card-icon">🃏</span>
+        <div>
+          <div class="nav-card-title">Flashcards</div>
+          <div class="nav-card-desc">Apprends les mots un par un</div>
+        </div>
+      </a>
+      <a href="articles.html" class="nav-card nav-card--articles">
+        <span class="nav-card-icon">🎯</span>
+        <div>
+          <div class="nav-card-title">Der, Die ou Das ?</div>
+          <div class="nav-card-desc">Trouve le bon article !</div>
+        </div>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    fetch('vocabulary.json')
+      .then(r => r.json())
+      .then(data => {
+        const withArticle = data.filter(w => w.article);
+        document.getElementById('word-count').textContent =
+          data.length + ' mots dont ' + withArticle.length + ' avec article';
+      })
+      .catch(() => {
+        document.getElementById('word-count').textContent = 'Erreur de chargement';
+      });
+  </script>
+</body>
+</html>
