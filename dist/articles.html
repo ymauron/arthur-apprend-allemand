@@ -42,22 +42,26 @@
       <div class="result-title" id="result-title">Bravo !</div>
       <div class="result-percent" id="result-percent">0%</div>
       <div class="result-score" id="result-detail"></div>
-      <button class="btn btn-primary btn-block" onclick="restart()">🔄 Rejouer</button>
+      <button class="btn btn-danger btn-block" id="retry-wrong-btn" onclick="retryWrong()" style="display:none;">🔁 Refaire les erreurs</button>
+      <button class="btn btn-primary btn-block" onclick="restart()" style="margin-top:12px;">🔄 Tout rejouer</button>
       <a href="index.html" class="btn btn-outline btn-block" style="margin-top:12px;">← Accueil</a>
     </div>
   </div>
 
   <script>
+    let allWords = [];
     let words = [];
     let index = 0;
     let correct = 0;
     let total = 0;
     let locked = false;
+    let wrongWords = [];
 
     fetch('vocabulary.json')
       .then(r => r.json())
       .then(data => {
-        words = data.filter(w => w.article !== null);
+        allWords = data.filter(w => w.article !== null);
+        words = allWords.slice();
         shuffleWords();
         showWord();
       });
@@ -99,6 +103,7 @@
           '✅ Bravo ! ' + w.article + ' ' + w.german +
           '<div class="feedback-detail">' + w.french + '</div></div>';
       } else {
+        wrongWords.push(w);
         fb.innerHTML = '<div class="feedback feedback--wrong shake">' +
           '❌ C\'était <strong>' + w.article + ' ' + w.german + '</strong>' +
           '<div class="feedback-detail">' + w.french + '</div></div>';
@@ -126,7 +131,18 @@
       document.getElementById('result-detail').textContent =
         correct + ' bonnes réponses sur ' + words.length;
 
-      if (pct >= 80) {
+      const retryBtn = document.getElementById('retry-wrong-btn');
+      if (wrongWords.length > 0) {
+        retryBtn.style.display = 'block';
+        retryBtn.textContent = '🔁 Refaire les ' + wrongWords.length + ' erreur' + (wrongWords.length > 1 ? 's' : '');
+      } else {
+        retryBtn.style.display = 'none';
+      }
+
+      if (pct === 100) {
+        document.getElementById('result-emoji').textContent = '🏆';
+        document.getElementById('result-title').textContent = 'Parfait !';
+      } else if (pct >= 80) {
         document.getElementById('result-emoji').textContent = '🏆';
         document.getElementById('result-title').textContent = 'Super champion !';
       } else if (pct >= 50) {
@@ -138,7 +154,21 @@
       }
     }
 
+    function retryWrong() {
+      words = wrongWords.slice();
+      wrongWords = [];
+      index = 0;
+      correct = 0;
+      total = 0;
+      shuffleWords();
+      document.getElementById('quiz-screen').style.display = 'block';
+      document.getElementById('result-screen').style.display = 'none';
+      showWord();
+    }
+
     function restart() {
+      words = allWords.slice();
+      wrongWords = [];
       index = 0;
       correct = 0;
       total = 0;
